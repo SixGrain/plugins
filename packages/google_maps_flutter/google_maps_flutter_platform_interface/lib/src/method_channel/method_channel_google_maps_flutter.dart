@@ -5,11 +5,10 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
-
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
 import 'package:stream_transform/stream_transform.dart';
 
@@ -27,6 +26,8 @@ class MethodChannelGoogleMapsFlutter extends GoogleMapsFlutterPlatform {
   // Keep a collection of id -> channel
   // Every method call passes the int mapId
   final Map<int, MethodChannel> _channels = {};
+
+  final Map<TileOverlayId, TileOverlay> _tileOverlays = {};
 
   /// Accesses the MethodChannel associated to the passed mapId.
   MethodChannel channel(int mapId) {
@@ -184,9 +185,35 @@ class MethodChannelGoogleMapsFlutter extends GoogleMapsFlutterPlatform {
           LatLng.fromJson(call.arguments['position']),
         ));
         break;
+      case 'tileOverlay#getTile':
+        return await _getTile(
+          tileOverlayIdParam: call.arguments['tileOverlayId'],
+          x: call.arguments['x'],
+          y: call.arguments['y'],
+          zoom: call.arguments['zoom'],
+        );
+        break;
       default:
         throw MissingPluginException();
     }
+  }
+
+  Future<Map<String, dynamic>> _getTile(
+      {String tileOverlayIdParam, int x, int y, int zoom}) async {
+    assert(tileOverlayIdParam != null);
+    final TileOverlayId tileOverlayId = TileOverlayId(tileOverlayIdParam);
+    final TileOverlay tileOverlay = _tileOverlays[tileOverlayId];
+
+    Tile tile;
+    if (tileOverlay != null && tileOverlay.tileProvider != null) {
+      tile = await tileOverlay.tileProvider.getTile(x, y, zoom);
+    }
+
+    if (tile == null) {
+      tile = TileProvider.noTile;
+    }
+
+    return tile.toJson();
   }
 
   /// Updates configuration options of the map user interface.
@@ -279,6 +306,44 @@ class MethodChannelGoogleMapsFlutter extends GoogleMapsFlutterPlatform {
       'circles#update',
       circleUpdates.toJson(),
     );
+  }
+
+  /// Updates tile overlays configuration.
+  ///
+  /// Change listeners are notified once the update has been made on the
+  /// platform side.
+  ///
+  /// The returned [Future] completes after listeners have been notified.
+  @override
+  Future<void> updateTileOverlays(TileOverlayUpdates tileOverlayUpdates,
+      {@required int mapId}) {
+    assert(tileOverlayUpdates != null);
+    return channel(mapId).invokeMethod<void>(
+      'tileOverlays#update',
+      tileOverlayUpdates.toJson(),
+    );
+  }
+
+  /// Clears the tile cache so that all tiles will be requested again from the
+  /// [TileProvider]. The current tiles from this tile overlay will also be
+  /// cleared from the map after calling this method. The API maintains a small
+  /// in-memory cache of tiles. If you want to cache tiles for longer, you
+  /// should implement an on-disk cache.
+  @override
+  Future<void> clearTileCache(TileOverlayId tileOverlayId,
+      {@required int mapId}) {
+    return channel(mapId)
+        .invokeMethod<void>('tileOverlays#clearTileCache', <String, dynamic>{
+      'tileOverlayId': tileOverlayId.value,
+    });
+  }
+
+  /// Sets overlays for map tiles
+  @override
+  Future<void> setTileOverlays(
+      Map<TileOverlayId, TileOverlay> tileOverlays) async {
+    _tileOverlays.clear();
+    _tileOverlays.addAll(tileOverlays ?? []);
   }
 
   /// Starts an animated change of the map camera position.

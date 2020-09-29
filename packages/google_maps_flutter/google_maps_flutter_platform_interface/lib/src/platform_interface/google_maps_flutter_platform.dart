@@ -5,14 +5,13 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:flutter/widgets.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-
-import 'package:google_maps_flutter_platform_interface/src/method_channel/method_channel_google_maps_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
+import 'package:google_maps_flutter_platform_interface/src/method_channel/method_channel_google_maps_flutter.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 /// The interface that platform-specific implementations of `google_maps_flutter` must extend.
@@ -113,6 +112,32 @@ abstract class GoogleMapsFlutterPlatform extends PlatformInterface {
     @required int mapId,
   }) {
     throw UnimplementedError('updateCircles() has not been implemented.');
+  }
+
+  /// Updates tile overlays configuration.
+  ///
+  /// Change listeners are notified once the update has been made on the
+  /// platform side.
+  ///
+  /// The returned [Future] completes after listeners have been notified.
+  Future<void> updateTileOverlays(TileOverlayUpdates tileOverlayUpdates,
+      {@required int mapId}) {
+    throw UnimplementedError('updateTileOverlays() has not been implemented.');
+  }
+
+  /// Clears the tile cache so that all tiles will be requested again from the
+  /// [TileProvider]. The current tiles from this tile overlay will also be
+  /// cleared from the map after calling this method. The API maintains a small
+  /// in-memory cache of tiles. If you want to cache tiles for longer, you
+  /// should implement an on-disk cache.
+  Future<void> clearTileCache(TileOverlayId tileOverlayId,
+      {@required int mapId}) {
+    throw UnimplementedError('clearTileCache() has not been implemented.');
+  }
+
+  /// Sets overlays for map tiles
+  Future<void> setTileOverlays(Map<TileOverlayId, TileOverlay> tileOverlays){
+    throw UnimplementedError('setTileOverlays() has not been implemented.');
   }
 
   /// Starts an animated change of the map camera position.
