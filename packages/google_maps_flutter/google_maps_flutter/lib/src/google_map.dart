@@ -238,7 +238,7 @@ class _GoogleMapState extends State<GoogleMap> {
       'polylinesToAdd': serializePolylineSet(widget.polylines),
       'circlesToAdd': serializeCircleSet(widget.circles),
       '_webOnlyMapCreationId': _webOnlyMapCreationId,
-      'tileOverlaysToAdd': _serializeTileOverlaySet(widget.tileOverlays),
+      'tileOverlaysToAdd': serializeTileOverlaySet(widget.tileOverlays),
     };
 
     return _googleMapsFlutterPlatform.buildView(
@@ -256,7 +256,7 @@ class _GoogleMapState extends State<GoogleMap> {
     _polygons = keyByPolygonId(widget.polygons);
     _polylines = keyByPolylineId(widget.polylines);
     _circles = keyByCircleId(widget.circles);
-    _tileOverlays = _keyTileOverlayId(widget.tileOverlays);
+    _tileOverlays = keyByTileOverlayId(widget.tileOverlays);
   }
 
   @override
@@ -325,9 +325,9 @@ class _GoogleMapState extends State<GoogleMap> {
   void _updateTileOverlays() async {
     final GoogleMapController controller = await _controller.future;
     // ignore: unawaited_futures
-    controller._updateTileOverlays(_TileOverlayUpdates.from(
+    controller.updateTileOverlays(TileOverlayUpdates.from(
         _tileOverlays.values.toSet(), widget.tileOverlays));
-    _tileOverlays = _keyTileOverlayId(widget.tileOverlays);
+    _tileOverlays = keyByTileOverlayId(widget.tileOverlays);
   }
 
   Future<void> onPlatformViewCreated(int id) async {
@@ -406,7 +406,7 @@ class _GoogleMapState extends State<GoogleMap> {
     if (tile == null) {
       tile = TileProvider.noTile;
     }
-    return tile._toJson();
+    return tile.toJson();
   }
 }
 

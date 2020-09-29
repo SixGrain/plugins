@@ -13,7 +13,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
 import 'package:google_maps_flutter_platform_interface/src/method_channel/method_channel_google_maps_flutter.dart';
 
@@ -43,12 +42,11 @@ export 'package:google_maps_flutter_platform_interface/google_maps_flutter_platf
         PolygonId,
         Polyline,
         PolylineId,
-        ScreenCoordinate;
+        ScreenCoordinate,
+        Tile,
+        TileOverlay,
+        TileOverlayId,
+        TileProvider;
 
 part 'src/controller.dart';
 part 'src/google_map.dart';
-
-part 'src/tile.dart';
-part 'src/tile_provider.dart';
-part 'src/tile_overlay.dart';
-part 'src/tile_overlay_updates.dart';

@@ -174,13 +174,9 @@ class GoogleMapController {
   /// platform side.
   ///
   /// The returned [Future] completes after listeners have been notified.
-  Future<void> _updateTileOverlays(
-      _TileOverlayUpdates tileOverlayUpdates) async {
-    assert(tileOverlayUpdates != null);
-    await channel.invokeMethod<void>(
-      'tileOverlays#update',
-      tileOverlayUpdates._toMap(),
-    );
+  Future<void> updateTileOverlays(TileOverlayUpdates tileOverlayUpdates) {
+    return _googleMapsFlutterPlatform.updateTileOverlays(tileOverlayUpdates,
+        mapId: mapId);
   }
 
   /// Clears the tile cache so that all tiles will be requested again from the
@@ -188,11 +184,9 @@ class GoogleMapController {
   /// cleared from the map after calling this method. The API maintains a small
   /// in-memory cache of tiles. If you want to cache tiles for longer, you
   /// should implement an on-disk cache.
-  Future<void> clearTileCache(TileOverlayId tileOverlayId) async {
-    await channel
-        .invokeMethod<void>('tileOverlays#clearTileCache', <String, dynamic>{
-      'tileOverlayId': tileOverlayId.value,
-    });
+  Future<void> clearTileCache(TileOverlayId tileOverlayId) {
+    return _googleMapsFlutterPlatform.clearTileCache(tileOverlayId,
+        mapId: mapId);
   }
 
   /// Sets the styling of the base map.
