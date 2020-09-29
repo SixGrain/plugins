@@ -56,6 +56,7 @@ class TileOverlayUpdates {
     tileOverlaysToAdd = _tileOverlaysToAdd;
     tileOverlayIdsToRemove = _tileOverlayIdsToRemove;
     tileOverlaysToChange = _tileOverlaysToChange;
+    tileOverlaysMap = currentTileOverlays;
   }
 
   /// Set of TileOverlays to be added in this update.
@@ -66,6 +67,9 @@ class TileOverlayUpdates {
 
   /// Set of TileOverlays to be changed in this update.
   Set<TileOverlay> tileOverlaysToChange;
+
+  /// Map of all available overlays
+  Map<TileOverlayId, TileOverlay> tileOverlaysMap;
 
   /// Converts this object to something serializable in JSON.
   Map<String, dynamic> toJson() {

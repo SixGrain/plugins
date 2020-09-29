@@ -135,11 +135,6 @@ abstract class GoogleMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('clearTileCache() has not been implemented.');
   }
 
-  /// Sets overlays of map tiles for handing get tile method
-  Future<void> setTileOverlays(Map<TileOverlayId, TileOverlay> tileOverlays) {
-    throw UnimplementedError('clearTileCache() has not been implemented.');
-  }
-
   /// Starts an animated change of the map camera position.
   ///
   /// The returned [Future] completes after the change has been started on the
