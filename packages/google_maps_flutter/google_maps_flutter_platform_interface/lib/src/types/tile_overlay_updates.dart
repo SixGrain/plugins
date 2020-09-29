@@ -1,12 +1,15 @@
-part of google_maps_flutter;
+import 'dart:ui' show hashValues;
+
+import 'package:flutter/foundation.dart' show setEquals;
+import 'package:google_maps_flutter_platform_interface/src/types/tile_overlay.dart';
+import 'package:google_maps_flutter_platform_interface/src/types/utils/tile_overlay.dart';
 
 /// [TileProvider] update events to be applied to the [GoogleMap].
 ///
 /// Used in [GoogleMapController] when the map is updated.
-class _TileOverlayUpdates {
+class TileOverlayUpdates {
   /// Computes [_MarkerUpdates] given previous and current [Marker]s.
-  _TileOverlayUpdates.from(
-      Set<TileOverlay> previous, Set<TileOverlay> current) {
+  TileOverlayUpdates.from(Set<TileOverlay> previous, Set<TileOverlay> current) {
     if (previous == null) {
       previous = Set<TileOverlay>.identity();
     }
@@ -16,9 +19,9 @@ class _TileOverlayUpdates {
     }
 
     final Map<TileOverlayId, TileOverlay> previousTileOverlays =
-        _keyTileOverlayId(previous);
+        keyByTileOverlayId(previous);
     final Map<TileOverlayId, TileOverlay> currentTileOverlays =
-        _keyTileOverlayId(current);
+        keyByTileOverlayId(current);
 
     final Set<TileOverlayId> prevTileOverlayIds =
         previousTileOverlays.keys.toSet();
@@ -55,11 +58,17 @@ class _TileOverlayUpdates {
     tileOverlaysToChange = _tileOverlaysToChange;
   }
 
+  /// Set of TileOverlays to be added in this update.
   Set<TileOverlay> tileOverlaysToAdd;
+
+  /// Set of TileOverlayIds to be removed in this update.
   Set<TileOverlayId> tileOverlayIdsToRemove;
+
+  /// Set of TileOverlays to be changed in this update.
   Set<TileOverlay> tileOverlaysToChange;
 
-  Map<String, dynamic> _toMap() {
+  /// Converts this object to something serializable in JSON.
+  Map<String, dynamic> toJson() {
     final Map<String, dynamic> updateMap = <String, dynamic>{};
 
     void addIfNonNull(String fieldName, dynamic value) {
@@ -69,9 +78,9 @@ class _TileOverlayUpdates {
     }
 
     addIfNonNull(
-        'tileOverlaysToAdd', _serializeTileOverlaySet(tileOverlaysToAdd));
+        'tileOverlaysToAdd', serializeTileOverlaySet(tileOverlaysToAdd));
     addIfNonNull(
-        'tileOverlaysToChange', _serializeTileOverlaySet(tileOverlaysToChange));
+        'tileOverlaysToChange', serializeTileOverlaySet(tileOverlaysToChange));
     addIfNonNull(
         'tileOverlayIdsToRemove',
         tileOverlayIdsToRemove
@@ -85,7 +94,7 @@ class _TileOverlayUpdates {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other.runtimeType != runtimeType) return false;
-    final _TileOverlayUpdates typedOther = other;
+    final TileOverlayUpdates typedOther = other;
     return setEquals(tileOverlaysToAdd, typedOther.tileOverlaysToAdd) &&
         setEquals(tileOverlayIdsToRemove, typedOther.tileOverlayIdsToRemove) &&
         setEquals(tileOverlaysToChange, typedOther.tileOverlaysToChange);

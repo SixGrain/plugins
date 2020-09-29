@@ -1,4 +1,40 @@
-part of google_maps_flutter;
+
+import 'dart:typed_data';
+
+import 'package:meta/meta.dart';
+
+/// Contains information about a Tile that is returned by a [TileProvider].
+@immutable
+class Tile {
+  /// Creates an immutable representation of a [Tile] to draw by [TileProvider].
+  const Tile(this.width, this.height, this.data);
+
+  /// The width of the image encoded by data in pixels.
+  final int width;
+
+  /// The height of the image encoded by data in pixels.
+  final int height;
+
+  /// A byte array containing the image data.
+  final Uint8List data;
+
+  /// Converts this object to something serializable in JSON.
+  dynamic toJson() {
+    final Map<String, dynamic> json = <String, dynamic>{};
+
+    void addIfPresent(String fieldName, dynamic value) {
+      if (value != null) {
+        json[fieldName] = value;
+      }
+    }
+
+    addIfPresent('width', width);
+    addIfPresent('height', height);
+    addIfPresent('data', data);
+
+    return json;
+  }
+}
 
 /// Uniquely identifies a [TileOverlay] among [GoogleMap] tile overlays.
 ///
@@ -115,7 +151,8 @@ class TileOverlay {
     );
   }
 
-  dynamic _toJson() {
+  /// Converts this object to something serializable in JSON.
+  dynamic toJson() {
     final Map<String, dynamic> json = <String, dynamic>{};
 
     void addIfPresent(String fieldName, dynamic value) {
@@ -151,22 +188,12 @@ class TileOverlay {
   int get hashCode => tileOverlayId.hashCode;
 }
 
-Map<TileOverlayId, TileOverlay> _keyTileOverlayId(
-    Iterable<TileOverlay> tileOverlays) {
-  if (tileOverlays == null) {
-    return <TileOverlayId, TileOverlay>{};
-  }
-  return Map<TileOverlayId, TileOverlay>.fromEntries(tileOverlays.map(
-      (TileOverlay tileOverlay) => MapEntry<TileOverlayId, TileOverlay>(
-          tileOverlay.tileOverlayId, tileOverlay)));
+/// An interface for a class that provides the tile images for a TileOverlay.
+abstract class TileProvider {
+  /// Stub tile that is used to indicate that no tile exists for a specific tile coordinate.
+  static const Tile noTile = Tile(-1, -1, null);
+
+  /// Returns the tile to be used for this tile coordinate.
+  Future<Tile> getTile(int x, int y, int zoom);
 }
 
-List<Map<String, dynamic>> _serializeTileOverlaySet(
-    Set<TileOverlay> tileOverlays) {
-  if (tileOverlays == null) {
-    return null;
-  }
-  return tileOverlays
-      .map<Map<String, dynamic>>((TileOverlay p) => p._toJson())
-      .toList();
-}
