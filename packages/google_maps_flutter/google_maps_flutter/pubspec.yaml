@@ -10,7 +10,7 @@ dependencies:
   google_maps_flutter_platform_interface:
     git:
       url: git://github.com/SixGrain/plugins.git
-      path: packages/google_maps_flutter/google_maps_flutter_platform_interface
+      path: packages/google_maps_flutter/google_maps_flutter_platform_interface/
       ref: tile_overlays_master
 
 dev_dependencies:
