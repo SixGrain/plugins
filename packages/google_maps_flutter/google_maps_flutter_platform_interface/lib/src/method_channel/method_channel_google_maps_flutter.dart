@@ -27,7 +27,8 @@ class MethodChannelGoogleMapsFlutter extends GoogleMapsFlutterPlatform {
   // Every method call passes the int mapId
   final Map<int, MethodChannel> _channels = {};
 
-  final Map<TileOverlayId, TileOverlay> _tileOverlays = {};
+  Map<TileOverlayId, TileOverlay> _tileOverlays =
+      <TileOverlayId, TileOverlay>{};
 
   /// Accesses the MethodChannel associated to the passed mapId.
   MethodChannel channel(int mapId) {
@@ -318,19 +319,18 @@ class MethodChannelGoogleMapsFlutter extends GoogleMapsFlutterPlatform {
   Future<void> updateTileOverlays(TileOverlayUpdates tileOverlayUpdates,
       {@required int mapId}) {
     assert(tileOverlayUpdates != null);
-    _tileOverlays.removeWhere((key, value) =>
-        tileOverlayUpdates.tileOverlayIdsToRemove.contains(key));
-    [
-      ...tileOverlayUpdates.tileOverlaysToAdd,
-      ...tileOverlayUpdates.tileOverlaysToChange
-    ].forEach((element) {
-      _tileOverlays[element.tileOverlayId] = element;
-    });
-
     return channel(mapId).invokeMethod<void>(
       'tileOverlays#update',
       tileOverlayUpdates.toJson(),
     );
+  }
+
+  /// Sets overlays of map tiles for handing get tile method
+  @override
+  Future<void> setTileOverlays(
+      Map<TileOverlayId, TileOverlay> tileOverlays) async {
+    _tileOverlays.clear();
+    _tileOverlays.addAll(tileOverlays);
   }
 
   /// Clears the tile cache so that all tiles will be requested again from the
