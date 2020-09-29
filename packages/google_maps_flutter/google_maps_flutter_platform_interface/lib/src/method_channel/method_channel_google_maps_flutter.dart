@@ -318,6 +318,15 @@ class MethodChannelGoogleMapsFlutter extends GoogleMapsFlutterPlatform {
   Future<void> updateTileOverlays(TileOverlayUpdates tileOverlayUpdates,
       {@required int mapId}) {
     assert(tileOverlayUpdates != null);
+    _tileOverlays.removeWhere((key, value) =>
+        tileOverlayUpdates.tileOverlayIdsToRemove.contains(key));
+    [
+      ...tileOverlayUpdates.tileOverlaysToAdd,
+      ...tileOverlayUpdates.tileOverlaysToChange
+    ].forEach((element) {
+      _tileOverlays[element.tileOverlayId] = element;
+    });
+
     return channel(mapId).invokeMethod<void>(
       'tileOverlays#update',
       tileOverlayUpdates.toJson(),
@@ -336,14 +345,6 @@ class MethodChannelGoogleMapsFlutter extends GoogleMapsFlutterPlatform {
         .invokeMethod<void>('tileOverlays#clearTileCache', <String, dynamic>{
       'tileOverlayId': tileOverlayId.value,
     });
-  }
-
-  /// Sets overlays for map tiles
-  @override
-  Future<void> setTileOverlays(
-      Map<TileOverlayId, TileOverlay> tileOverlays) async {
-    _tileOverlays.clear();
-    _tileOverlays.addAll(tileOverlays ?? []);
   }
 
   /// Starts an animated change of the map camera position.
